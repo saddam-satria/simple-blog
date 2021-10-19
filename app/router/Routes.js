@@ -1,10 +1,14 @@
-const express =require('express')
-const {homepage} = require('../controllers/pagesController')
+const express = require('express');
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/' , homepage)
+// Pages
+router.get('/', (req,res) => {
+    res.send("Berhasil")
+});
 
 
+// Api
 
-module.exports = router
+
+module.exports = router;
