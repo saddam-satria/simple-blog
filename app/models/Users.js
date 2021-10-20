@@ -1,4 +1,7 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 ('use strict');
 
 module.exports = (sequelize, DataTypes) => {
@@ -63,12 +66,21 @@ module.exports = (sequelize, DataTypes) => {
     lastActive: {
       type: DataTypes.DATE,
       defaultValue: sequelize.NOW,
+      allowNull: true,
     },
   });
 
   Users.beforeCreate(async (user, _option) => {
     const hashPassword = await bcrypt.hash(user.password, 12);
     user.password = hashPassword;
+    user.lastActive = Date.now();
+
+    const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '3d' });
+    user.refreshToken = refreshToken;
+  });
+
+  Users.beforeUpdate(async (user, _option) => {
+    user.updatedAt = Date.now();
   });
   return Users;
 };

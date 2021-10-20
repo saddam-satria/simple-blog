@@ -1,20 +1,14 @@
 const express = require('express');
-const controllers = require('../controllers/apiController') 
+const userControllers = require('../controllers/userControllers');
 
 const router = express.Router();
 
-// Pages
-router
-.route('/api/v1/users')
-.post(controllers.addUsers)
-.get(controllers.getAllUsers)
-
-router
-.route('/api/v1/user/:id')
-.delete(controllers.deleteUser)
-.put(controllers.updateUser)
-
 // Api
+// users
+router.route('/api/v1/users').post(userControllers.addUsers).get(userControllers.getAllUsers);
+router.route('/api/v1/user/:id').delete(userControllers.deleteUser).put(userControllers.updateUser).get(userControllers.logoutUser)
+router.post('/api/v1/user/login', userControllers.loginUser)
 
+// Author
 
 module.exports = router;
