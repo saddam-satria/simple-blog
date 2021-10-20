@@ -1,12 +1,18 @@
 const express = require('express');
+const controllers = require('../controllers/apiController') 
 
 const router = express.Router();
 
 // Pages
-router.get('/', (req,res) => {
-    res.send("Berhasil")
-});
+router
+.route('/api/v1/users')
+.post(controllers.addUsers)
+.get(controllers.getAllUsers)
 
+router
+.route('/api/v1/user/:id')
+.delete(controllers.deleteUser)
+.put(controllers.updateUser)
 
 // Api
 
