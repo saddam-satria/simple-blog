@@ -9,7 +9,7 @@ const addUsers = async (req, res) => {
       throw result.msg;
     }
     const accessToken = helpers.generateTokenJWT('', result.user);
-    res.status(200).json({ status: 'success', msg: 'success create new user', token: accessToken });
+    res.status(200).json({ status: 'success', msg: 'success create new user', token: accessToken, user: result.user });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
@@ -17,12 +17,9 @@ const addUsers = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const result = await helpers.queryAllUsers();
-    if (result.error) {
-      throw result.msg;
-    }
+    const allUsers = await sequelize.models.Users.findAll();
 
-    res.status(200).json({ status: 'success', msg: 'success get all users', users: result.users });
+    res.status(200).json({ status: 'success', msg: 'success get all users', users: allUsers });
   } catch (error) {
     res.json({ status: 'error', msg: error }).status(401);
   }
@@ -31,11 +28,15 @@ const getAllUsers = async (req, res) => {
 const deleteUser = async (req, res) => {
   const id = req.params.id;
   try {
-    const result = await helpers.deleteUser(id);
-    if (result.error) {
-      throw result.msg;
+    const deletedUser = await sequelize.models.Users.destroy({
+      where: {
+        id,
+      },
+    });
+    if(deletedUser  < 1) {
+      throw "User not found"
     }
-    res.status(200).json({ status: 'success', msg: 'success delete user', deletedUser: result.user });
+    res.status(200).json({ status: 'success', msg: 'success delete user', deletedUser: deletedUser });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
@@ -59,11 +60,22 @@ const updateUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   const id = req.params.id;
   try {
-    const result = await helpers.logout(id);
-    if (result.error) {
-      throw result.msg;
+    // Set token null, lastActive null
+    const logoutUser = await sequelize.models.Users.update(
+      {
+        refreshToken: null,
+        lastActive: Date.now(),
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    if (logoutUser[0] === 0) {
+      throw 'User not Found';
     }
-    res.status(200).json({ status: 'success', msg: result.msg });
+    res.status(200).json({ status: 'success', msg: 'Successfully Logout' });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
@@ -94,9 +106,23 @@ const loginUser = async (req, res) => {
         where: { id: user.dataValues.id },
       }
     );
-    res.status(200).json({ status: 'success', msg: 'login success', token: accessToken });
+
+    res.status(200).json({ status: 'success', msg: 'login success', token: accessToken, user: user.id });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
 };
-module.exports = { addUsers, getAllUsers, deleteUser, updateUser, logoutUser, loginUser };
+
+const detailUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await sequelize.models.Users.findOne({ include: sequelize.models.Authors,where: {id} });
+    if (user ===  null) {
+      throw "User not found"
+    }
+    res.status(200).json({ status: 'success', msg: 'success get user info', userInfo: user });
+  } catch (error) {
+    res.status(401).json({ status: 'error', msg: error });
+  }
+};
+module.exports = { addUsers, getAllUsers, deleteUser, updateUser, logoutUser, loginUser, detailUser };

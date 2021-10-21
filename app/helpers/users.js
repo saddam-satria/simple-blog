@@ -5,16 +5,6 @@ const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
-const queryAllUsers = async () => {
-  try {
-    const allUsers = await sequelize.models.Users.findAll();
-
-    return { error: false, users: allUsers };
-  } catch (error) {
-    return { error: true, msg: error };
-  }
-};
-
 const passwordValidation = async (action, password, passwordHash) => {
   if (action === 'check') {
     const checkPassword = await bcrypt.compare(password, passwordHash);
@@ -39,6 +29,7 @@ const userBuilder = async (status, id, firstname, lastname, email, password, ima
           email,
           password: hashedPassword,
           image,
+          updatedAt: Date.now(),
         },
         {
           where: {
@@ -66,51 +57,16 @@ const userBuilder = async (status, id, firstname, lastname, email, password, ima
   }
 };
 
-const deleteUser = async (id) => {
-  try {
-    const deletedUser = await sequelize.models.Users.destroy({
-      where: {
-        id,
-      },
-    });
-    return { error: false, user: deletedUser };
-  } catch (error) {
-    return { error: true, msg: error };
-  }
-};
-
 const generateTokenJWT = (action, payload) => {
   const { REFRESH_TOKEN_SECRET_KEY, ACCESS_TOKEN_SECRET_KEY } = process.env;
 
   if (action === 'refresh') {
-    const refreshToken = jwt.sign({ payload }, REFRESH_TOKEN_SECRET_KEY, { expiresIn: '3d' });
+    const refreshToken = jwt.sign({ payload }, REFRESH_TOKEN_SECRET_KEY, { expiresIn: '7d' });
     return refreshToken;
   }
 
-  const accessToken = jwt.sign({ payload }, ACCESS_TOKEN_SECRET_KEY, { expiresIn: '15s' });
+  const accessToken = jwt.sign({ payload }, ACCESS_TOKEN_SECRET_KEY, { expiresIn: '15m' });
   return { token: accessToken, type: 'access token' };
 };
 
-const logout = async (id) => {
-  try {
-    // Set token null, lastActive null
-    const logoutUser = await sequelize.models.Users.update(
-      {
-        refreshToken: null,
-      },
-      {
-        where: {
-          id,
-        },
-      }
-    );
-    if (logoutUser[0] === 0) {
-      throw 'User not Found';
-    }
-    return { error: false, msg: 'Successfully Logout' };
-  } catch (error) {
-    return { error: true, msg: error };
-  }
-};
-
-module.exports = { queryAllUsers, passwordValidation, userBuilder, deleteUser, generateTokenJWT, logout };
+module.exports = { passwordValidation, userBuilder, generateTokenJWT };

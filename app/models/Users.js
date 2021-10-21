@@ -53,11 +53,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     createdAt: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.NOW,
     },
     refreshToken: {
       type: DataTypes.STRING,
@@ -74,13 +72,14 @@ module.exports = (sequelize, DataTypes) => {
     const hashPassword = await bcrypt.hash(user.password, 12);
     user.password = hashPassword;
     user.lastActive = Date.now();
+    user.createdAt = Date.now();
 
     const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '3d' });
     user.refreshToken = refreshToken;
   });
 
-  Users.beforeUpdate(async (user, _option) => {
-    user.updatedAt = Date.now();
-  });
+  Users.associate = (models) => {
+    Users.hasOne(models.Authors);
+  };
   return Users;
 };
