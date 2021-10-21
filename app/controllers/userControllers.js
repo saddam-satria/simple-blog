@@ -1,13 +1,15 @@
 const helpers = require('../helpers/users');
 const { sequelize } = require('../models');
 
-const addUsers = async (req, res) => {
-  const { firstname, lastname, email, password, image } = req.body;
+const addUser = async (req, res) => {
+  const { firstname, lastname, email, password } = req.body;
+  const image = req.fileName;
   try {
     const result = await helpers.userBuilder('', null, firstname, lastname, email, password, image);
     if (result.error) {
       throw result.msg;
     }
+    res.userid = result;
     const accessToken = helpers.generateTokenJWT('', result.user);
     res.status(200).json({ status: 'success', msg: 'success create new user', token: accessToken, user: result.user });
   } catch (error) {
@@ -33,8 +35,8 @@ const deleteUser = async (req, res) => {
         id,
       },
     });
-    if(deletedUser  < 1) {
-      throw "User not found"
+    if (deletedUser < 1) {
+      throw 'User not found';
     }
     res.status(200).json({ status: 'success', msg: 'success delete user', deletedUser: deletedUser });
   } catch (error) {
@@ -43,7 +45,9 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { firstname, lastname, email, password, image } = req.body;
+  const { firstname, lastname, email, password } = req.body;
+
+  const image = req.fileName;
   const id = req.params.id;
 
   try {
@@ -116,13 +120,13 @@ const loginUser = async (req, res) => {
 const detailUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await sequelize.models.Users.findOne({ include: sequelize.models.Authors,where: {id} });
-    if (user ===  null) {
-      throw "User not found"
+    const user = await sequelize.models.Users.findOne({ include: sequelize.models.Authors, where: { id } });
+    if (user === null) {
+      throw 'User not found';
     }
     res.status(200).json({ status: 'success', msg: 'success get user info', userInfo: user });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
 };
-module.exports = { addUsers, getAllUsers, deleteUser, updateUser, logoutUser, loginUser, detailUser };
+module.exports = { addUser, getAllUsers, deleteUser, updateUser, logoutUser, loginUser, detailUser };

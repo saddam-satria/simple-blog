@@ -1,4 +1,3 @@
-
 ('use strict');
 
 module.exports = (sequelize, DataTypes) => {
@@ -40,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Authors.associate = (models) => {
     Authors.belongsTo(models.Users);
+    Authors.hasMany(models.Posts);
   };
 
   return Authors;

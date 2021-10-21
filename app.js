@@ -15,7 +15,7 @@ app.use(routes);
 const connectDB = async () => {
   try {
     await sequelize.sequelize.authenticate();
-    // await sequelize.sequelize.sync({ force: true });
+    // await sequelize.sequelize.sync({ alter: true });
     console.log('Database Connected');
   } catch (error) {
     console.log(error);

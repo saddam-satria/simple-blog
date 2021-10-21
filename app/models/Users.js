@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
           args: true,
           msg: 'Email have to be @',
         },
-        isLowercase: {
+        isLowerCase: {
           args: true,
           msg: 'username of email have to be lowercase',
         },
