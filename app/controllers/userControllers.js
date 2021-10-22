@@ -1,17 +1,24 @@
 const helpers = require('../helpers/users');
 const { sequelize } = require('../models');
+const { client } = require('../config/redis');
 
 const addUser = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
-  const image = req.fileName;
   try {
-    const result = await helpers.userBuilder('', null, firstname, lastname, email, password, image);
+    const result = await helpers.userBuilder('', null, firstname, lastname, email, password, '');
     if (result.error) {
       throw result.msg;
     }
     res.userid = result;
     const accessToken = helpers.generateTokenJWT('', result.user);
-    res.status(200).json({ status: 'success', msg: 'success create new user', token: accessToken, user: result.user });
+    const refreshToken = helpers.generateTokenJWT('refresh', result.user);
+    client.setex(result.user, 604800, refreshToken.token, (err, reply) => {
+      if (err) {
+        throw 'Failed cache';
+      }
+      console.log('cache ' + result.user + reply);
+    });
+    res.status(201).json({ status: 'success', msg: 'success create new user', accessToken, refreshToken });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
@@ -38,7 +45,7 @@ const deleteUser = async (req, res) => {
     if (deletedUser < 1) {
       throw 'User not found';
     }
-    res.status(200).json({ status: 'success', msg: 'success delete user', deletedUser: deletedUser });
+    res.status(201).json({ status: 'success', msg: 'success delete user', deletedUser: deletedUser });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
@@ -46,16 +53,14 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
-
-  const image = req.fileName;
   const id = req.params.id;
-
+  const image = req.file.filename;
   try {
     const result = await helpers.userBuilder('update', id, firstname, lastname, email, password, image);
     if (result.error) {
       throw result.msg;
     }
-    res.status(200).json({ status: 'success', msg: 'success update user', updateUser: result.user });
+    res.status(201).json({ status: 'success', msg: 'success update user', updateUser: result.user });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
@@ -67,7 +72,6 @@ const logoutUser = async (req, res) => {
     // Set token null, lastActive null
     const logoutUser = await sequelize.models.Users.update(
       {
-        refreshToken: null,
         lastActive: Date.now(),
       },
       {
@@ -101,17 +105,13 @@ const loginUser = async (req, res) => {
     }
     const accessToken = helpers.generateTokenJWT('', user.dataValues.id);
     const refreshToken = helpers.generateTokenJWT('refresh', user.dataValues.id);
-    await sequelize.models.Users.update(
-      {
-        refreshToken,
-        lastActive: Date.now(),
-      },
-      {
-        where: { id: user.dataValues.id },
+    client.setex(user.dataValues.id, 604800, refreshToken.token, (err, reply) => {
+      if (err) {
+        throw 'Failed cache';
       }
-    );
-
-    res.status(200).json({ status: 'success', msg: 'login success', token: accessToken, user: user.id });
+      console.log('cache ' + user.dataValues.id + reply);
+    });
+    res.status(200).json({ status: 'success', msg: 'login success', accessToken: accessToken, refreshToken });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
@@ -129,4 +129,33 @@ const detailUser = async (req, res) => {
     res.status(401).json({ status: 'error', msg: error });
   }
 };
-module.exports = { addUser, getAllUsers, deleteUser, updateUser, logoutUser, loginUser, detailUser };
+
+const revokeAccessToken = (req, res) => {
+  const refreshToken = req.header('Authorization').split(' ')[1];
+
+  try {
+    const result = helpers.compareTokenJWT('refresh', refreshToken);
+    if (result.err !== null) {
+      if (result.err.message.includes('invalid signature') || result.err.message.includes('jwt expired')) {
+        throw 'token error';
+      }
+    }
+
+    client.get(result.user.payload, (err, reply) => {
+      if (reply === null) {
+        throw 'user not found in cache';
+      }
+
+      if (reply === refreshToken) {
+        const newAccessToken = helpers.generateTokenJWT('', result.user.payload);
+        res.status(201).json({ status: 'success', newAccessToken });
+      } else {
+        res.status(403).json({ status: 'error', msg: 'Token is wrong' });
+      }
+    });
+  } catch (error) {
+    res.status(403).json({ status: 'error', msg: error });
+  }
+};
+
+module.exports = { addUser, getAllUsers, deleteUser, updateUser, logoutUser, loginUser, detailUser, revokeAccessToken };

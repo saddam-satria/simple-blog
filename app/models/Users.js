@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+
 require('dotenv').config();
 
 ('use strict');
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
           args: true,
           msg: 'Email have to be @',
         },
-        isLowerCase: {
+        isLowercase: {
           args: true,
           msg: 'username of email have to be lowercase',
         },
@@ -50,6 +50,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     image: {
       type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: '/static/img/assets/dummy-picture.png',
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -57,13 +59,8 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: {
       type: DataTypes.DATE,
     },
-    refreshToken: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     lastActive: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.NOW,
       allowNull: true,
     },
   });
@@ -73,10 +70,11 @@ module.exports = (sequelize, DataTypes) => {
     user.password = hashPassword;
     user.lastActive = Date.now();
     user.createdAt = Date.now();
-
-    const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '3d' });
-    user.refreshToken = refreshToken;
   });
+
+  Users.beforeUpdate((user,_option) => {
+    user.password = "saddam"
+  })
 
   Users.associate = (models) => {
     Users.hasOne(models.Authors);

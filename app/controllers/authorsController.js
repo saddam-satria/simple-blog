@@ -16,7 +16,7 @@ const addAuthor = async (req, res) => {
       birthDay: birthday,
       UserId: userId,
     });
-    res.status(200).json({ status: 'success', msg: 'success create new user', newAuthor: newAuthor.username });
+    res.status(201).json({ status: 'success', msg: 'success create new user', newAuthor: newAuthor.username });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }

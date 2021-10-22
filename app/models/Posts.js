@@ -18,6 +18,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       image: {
         type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
       },
       desc: {
         type: DataTypes.STRING,
@@ -26,8 +28,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
       },
       updatedAt: {
-        type: DataTypes.DATE
-      }
+        type: DataTypes.DATE,
+      },
     },
     {
       modelName: 'Posts',
@@ -38,12 +40,12 @@ module.exports = (sequelize, DataTypes) => {
   Posts.associate = (models) => {
     Posts.belongsTo(models.Authors);
   };
-  Posts.beforeCreate((post,_option) => {
+  Posts.beforeCreate((post, _option) => {
     post.createdAt = Date.now();
-  })
+  });
 
-  Posts.beforeUpdate((post,_option) => {
+  Posts.beforeUpdate((post, _option) => {
     post.updatedAt = Date.now();
-  })
+  });
   return Posts;
 };
