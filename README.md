@@ -24,4 +24,8 @@ download and install postgresql https://www.postgresql.org/download/ <br>
 change database config in .env or you can create .env file and make sure <br>
 variabel names are same in folder app/config<br>
 
+## redis store refresh token
+make sure you have redis-server on your server <br>
+if you don't, you can download at this link https://redis.io/
+
 <strong>note: this website is not deployment, just for practice 
