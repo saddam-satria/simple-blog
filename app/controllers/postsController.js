@@ -1,5 +1,6 @@
 const { sequelize } = require('../models');
 const { v4: uuidv4 } = require('uuid');
+const query = require('../helpers//query');
 
 const addPost = async (req, res) => {
   const { title, desc, authorId } = req.body;
@@ -34,12 +35,13 @@ const deletePost = async (req, res) => {
 };
 
 const getPosts = async (req, res) => {
-  const { limit } = req.params;
-  let newToken;
+  const { limit, page } = req.query;
+  const everyPage = (page - 1) * limit;
 
   try {
-    const posts = await sequelize.models.Posts.findAll({ limit });
-    res.status(200).json({ status: 'success', msg: 'success get all posts', posts });
+    const result = await query.getAllPosts(limit, everyPage);
+
+    res.status(200).json({ status: 'success', msg: 'success get all posts', posts: result });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }

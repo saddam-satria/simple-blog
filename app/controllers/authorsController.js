@@ -1,6 +1,6 @@
 const { sequelize } = require('../models');
 const { v4: uuidv4 } = require('uuid');
-
+const query = require('../helpers/query');
 
 const addAuthor = async (req, res) => {
   const { username, city, country, userId } = req.body;
@@ -23,8 +23,9 @@ const addAuthor = async (req, res) => {
 };
 
 const getAuthors = async (_req, res) => {
+  const { limit, page } = req.query;
   try {
-    const authors = await sequelize.models.Authors.findAll();
+    const authors = await query.getAllAuthors(limit, page);
     res.status(200).json({ status: 'success', msg: 'success get all authors', authors });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
@@ -80,7 +81,7 @@ const getDetailAuthor = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const author = await sequelize.models.Authors.findOne({include: sequelize.models.Users , where: { id } });
+    const author = await sequelize.models.Authors.findOne({ include: sequelize.models.Users, where: { id } });
     if (author < 1) {
       throw 'Author not found';
     }
