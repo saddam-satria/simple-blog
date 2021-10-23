@@ -17,8 +17,6 @@ localhost:5000 as a server and localhost:3000 as a client
 ## sequelize-cli 
 `npx sequelize -h`
 
-
-
 ## Postgres Configure 
 download and install postgresql https://www.postgresql.org/download/ <br>
 change database config in .env or you can create .env file and make sure <br>
