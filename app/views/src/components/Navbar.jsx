@@ -18,7 +18,7 @@ const Navbar = () => {
     <div className="Navbar bg-transparent w-full absolute top-0 z-40">
       <div className="navbar nav mx-12  py-4 sm:mx-18 lg:mx-32">
         <div className="flex py-0 sm:py-2">
-          <h1 className={`font-poppins font-bold ${location.pathname === '/' ? 'hover:text-blue-50 text-white' : 'text-gray-600 hover:text-gray-500'} `}>
+          <h1 className={`font-poppins text-xl font-bold ${location.pathname === '/' ? 'hover:text-blue-50 text-white' : 'text-gray-600 hover:text-gray-500'} `}>
             <Link to={'/'}>PERN STACK</Link>
           </h1>
           <div className="ml-auto sm:hidden capitalize">asdsad</div>
