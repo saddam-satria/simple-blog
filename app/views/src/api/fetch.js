@@ -7,7 +7,6 @@ const getAllApi = async (params) => {
     return { status: 'error', msg: 'Api Blocked ' };
   }
   const allData = await res.json();
-  console.log(allData);
   return allData;
 };
 
