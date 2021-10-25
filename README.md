@@ -6,6 +6,8 @@ Simple blog apps with PERN Stack technologies
 `npm install` <br>
 `cd views npm install `
 
+<img src= "https://raw.githubusercontent.com/saddam-satria/simple-blog/master/homepage.JPG"/>
+
 ## Development Mode
 `npm run dev`<br>
 ` cd views npm start `
