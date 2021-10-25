@@ -22,7 +22,7 @@ const addAuthor = async (req, res) => {
   }
 };
 
-const getAuthors = async (_req, res) => {
+const getAuthors = async (req, res) => {
   const { limit, page } = req.query;
   try {
     const authors = await query.getAllAuthors(limit, page);
