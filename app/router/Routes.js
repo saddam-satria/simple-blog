@@ -14,7 +14,7 @@ const rateLimiter = rateLimiterRequest({
   windowMs: 1 * 60 * 1000,
   max: 3,
   handler: (_req, res) => {
-    res.json({ status: 'error', msg: 'To many request' });
+    res.json({ status: 'error', msg: 'To many request' }).status(403);
   },
 });
 
