@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect } from 'react';
 import CardComponent from '../components/CardComponent';
 import { getAllApi } from '../api/fetch';
 
@@ -37,22 +37,23 @@ import { useState } from 'react';
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
-  const [error, setError] = useState(false);
+
   const [limit, setLimit] = useState(10);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getPosts = async () => {
       const res = await getAllApi(`posts?limit=${limit}`);
-
+      setLoading(true);
       if (res.status === 'success') {
         setBlogs(res.posts);
-      } else if (res.status === 'error') {
-        setError(true);
+        setLoading(false);
       }
     };
     getPosts();
   }, [limit]);
 
+  console.log(loading);
   const loadPostHandler = async (e) => {
     e.preventDefault();
     if (blogs.length > 10) {
@@ -64,21 +65,18 @@ const Blogs = () => {
     <div className="py-12 my-6">
       <div className="mx-4 lg:mx-8 xl:mx-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-          {error && <h4 className="text-red-600 font-medium text-2xl">Somethings Error</h4>}
           {blogs.map((blog, index) => {
             return (
-              <Suspense fallback={<h4>Loading ...</h4>}>
-                <div key={index}>
-                  <div>
-                    <CardComponent blog={blog} />
-                  </div>
+              <div key={index}>
+                <div>
+                  <CardComponent blog={blog} />
                 </div>
-              </Suspense>
+              </div>
             );
           })}
         </div>
       </div>
-      {blogs > 10 && (
+      {blogs.length > 10 && (
         <div className="flex justify-center">
           <button onClick={loadPostHandler} className="px-4 py-2 rounded-lg text-black bg-blue-300 font-poppins font-medium text-base capitalize">
             load more

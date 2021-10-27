@@ -1,6 +1,4 @@
-import React from 'react';
-
-const Register = () => {
+const CreateAuthors = () => {
   const submitHandler = (e) => {
     e.preventDefault();
   };
@@ -15,21 +13,17 @@ const Register = () => {
                 firstname
               </label>
               <input className="p-3 bg-blue-50 rounded-md my-4 focus:outline-none font-poppins" name="firstname" type="text" placeholder="firstname" />
-              <label htmlFor="lastname" className="capitalize font-normal font-poppins">
-                lastname
+              <label htmlFor="city" className="capitalize font-normal font-poppins">
+                city
               </label>
-              <input className="p-3 bg-blue-50 rounded-md my-4 focus:outline-none font-poppins" name="lastname" type="text" placeholder="lastname" />
-              <label htmlFor="email" className="capitalize font-normal font-poppins">
-                email
+              <input className="p-3 bg-blue-50 rounded-md my-4 focus:outline-none font-poppins" name="city" type="text" placeholder="city" />
+              <label htmlFor="country" className="capitalize font-normal font-poppins">
+                country
               </label>
-              <input className="p-3 bg-blue-50 rounded-md my-4 focus:outline-none font-poppins" name="email" type="email" placeholder="email" />
-              <label htmlFor="password" className="capitalize font-normal font-poppins">
-                password
-              </label>
-              <input className="p-3 my-4 bg-blue-50 rounded-md focus:outline-none font-poppins" name="password" type="password" placeholder="password" />
+              <input className="p-3 bg-blue-50 rounded-md my-4 focus:outline-none font-poppins" name="country" type="text" placeholder="country" />
               <div className="ml-auto">
                 <button type="submit" className="p-2 px-6 text-white capitalize rounded-md bg-blue-400">
-                  Register
+                  Become Author
                 </button>
               </div>
             </div>
@@ -40,4 +34,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default CreateAuthors;

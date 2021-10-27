@@ -18,7 +18,7 @@ const postCallApi = async (params, data) => {
     headers: {
       'content-type': 'application/json',
     },
-    body: data,
+    body: JSON.stringify(data),
   });
 
   const feedback = res.json();

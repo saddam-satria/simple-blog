@@ -21,7 +21,7 @@ const Home = () => {
           <Link to={'/blogs'} className="px-6 py-4 capitalize font-poppins hover:bg-red-600 bg-red-700 rounded-md  text-white">
             Start reading
           </Link>
-          <Link to={'/authors'} className="px-6 py-4 capitalize font-poppins hover:bg-blue-600 bg-blue-700 rounded-md mx-4 text-white">
+          <Link to={'/create-authors'} className="px-6 py-4 capitalize font-poppins hover:bg-blue-600 bg-blue-700 rounded-md mx-4 text-white">
             Become an authors
           </Link>
         </div>
