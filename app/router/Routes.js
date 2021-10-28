@@ -12,7 +12,7 @@ const router = express.Router();
 // Brute force handler
 const rateLimiter = rateLimiterRequest({
   windowMs: 1 * 60 * 1000,
-  max: 3,
+  max: 100,
   handler: (_req, res) => {
     res.json({ status: 'error', msg: 'To many request' }).status(403);
   },
@@ -33,14 +33,23 @@ router.route('/api/v1/user/:id').delete(userControllers.deleteUser).put(uploadIm
 // Not need this up
 
 router.post('/api/v1/user/login', rateLimiter, userControllers.loginUser);
+// Acesssing by refresh token
 router.get('/api/v1/revoketoken', authMiddleware.auth, userControllers.revokeAccessToken);
 
 // Author
+// accessing by access token
 router.route('/api/v1/authors').post(authMiddleware.auth, authorsController.addAuthor).get(authorsController.getAuthors);
 router.route('/api/v1/author/:id').delete(authMiddleware.auth, authorsController.deleteAuthor).put(authMiddleware.auth, authorsController.updateAuthors).get(authMiddleware.auth, authorsController.getDetailAuthor);
 
 // Posts
+// accessing by access token
 router.route('/api/v1/posts').post(authMiddleware.auth, uploadImagePost.single('image'), postsController.addPost).get(postsController.getPosts);
 router.route('/api/v1/post/:id').delete(authMiddleware.auth, postsController.deletePost).put(authMiddleware.auth, postsController.updatePost).get(postsController.detailPost);
 
 module.exports = router;
+
+// revoketoken -> refreshToken
+// auhtors -> posts -> Access Token
+// author:id -> delete,put,get -> Access Token
+// posts -> post -> Acess Token
+// posts:id -> delete put -> Access Token

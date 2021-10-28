@@ -18,9 +18,9 @@ const addUser = async (req, res) => {
       }
       console.log('cache ' + result.user + reply);
     });
-    res.status(201).json({ status: 'success', msg: 'success create new user', accessToken, refreshToken });
+    res.status(201).json({ status: 'success', msg: 'success create new user', accessToken, refreshToken, userId: result });
   } catch (error) {
-    res.status(401).json({ status: 'error', msg: error });
+    res.status(401).json({ status: 'error', msg: error.errors[0].message });
   }
 };
 
@@ -94,10 +94,11 @@ const loginUser = async (req, res) => {
 
   // const token = helpers.generateTokenJWT('')
   try {
-    const user = await sequelize.models.Users.findOne({ where: { email } });
+    const user = await sequelize.models.Users.findOne({ where: { email }, include: sequelize.models.Authors });
     if (user === null) {
       throw "Email does'nt exist";
     }
+
     // check password
     const checkPassword = await helpers.passwordValidation('check', password, user.dataValues.password);
     if (!checkPassword.match) {
@@ -111,7 +112,10 @@ const loginUser = async (req, res) => {
       }
       console.log('cache ' + user.dataValues.id + reply);
     });
-    res.status(200).json({ status: 'success', msg: 'login success', accessToken: accessToken, refreshToken });
+
+    const { Author } = user.dataValues;
+
+    res.status(200).json({ status: 'success', msg: 'login success', accessToken: accessToken, refreshToken, user: user.dataValues.id, author: Author });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }

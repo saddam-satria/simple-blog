@@ -67,7 +67,7 @@ const generateTokenJWT = (action, payload) => {
     return { token: refreshToken, type: 'refresh token' };
   }
 
-  const accessToken = jwt.sign({ payload }, ACCESS_TOKEN_SECRET_KEY, { expiresIn: '1m' });
+  const accessToken = jwt.sign({ payload }, ACCESS_TOKEN_SECRET_KEY, { expiresIn: '15m' });
   return { token: accessToken, type: 'access token' };
 };
 

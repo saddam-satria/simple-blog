@@ -1,6 +1,6 @@
 import { useState } from 'react';
-
 import { postCallApi } from '../api/fetch';
+import { login } from '../api/controller';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -17,19 +17,35 @@ const Login = () => {
     };
 
     try {
+      if (email.length < 1 || password.length < 1) {
+        throw 'Please, Fill the form';
+      }
+
       const result = await postCallApi('user/login', data);
       if ('status' in result) {
         if (result['status'] === 'error') {
           throw result['msg'];
         }
-        // create token auth
-        const refreshToken = result.refreshToken.token;
-        const accessToken = result.accessToken.token;
-        const { msg } = result;
-
-        setError(false);
-        setMessageStatus(msg);
       }
+      const { msg } = result;
+
+      setError(false);
+      setMessageStatus(msg);
+
+      // create token auth
+
+      const refreshToken = result.refreshToken.token;
+      const accessToken = result.accessToken.token;
+      const user = result.user;
+
+      login({ refreshToken, accessToken, user });
+
+      if (result.author === null) {
+        window.location.href = '/';
+      }
+
+      localStorage.setItem('authorId', JSON.stringify(result.author.id));
+      window.location.href = '/';
     } catch (error) {
       setError(true);
       setMessageStatus(error);

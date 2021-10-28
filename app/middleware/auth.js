@@ -1,15 +1,16 @@
 const helpers = require('../helpers/users');
 
 const auth = (req, res, next) => {
+  let token = req.header('Authorization');
   try {
-    let token = req.header('Authorization');
-    if(token === undefined) {
-      throw "Authorization header must fill"
+    if (token === undefined) {
+      throw 'Authorization header must fill';
     }
     token = token.split(' ')[1];
-    if (!token) {
-      throw 'Token Not Found';
+    if (token === null) {
+      throw 'Token not found';
     }
+
     const result = helpers.compareTokenJWT('', token);
 
     if (result.err !== null) {
@@ -19,6 +20,10 @@ const auth = (req, res, next) => {
 
       if (result.err.message.includes('jwt expired')) {
         throw 'generate new access token soon';
+      }
+
+      if (result.err.message.includes('jwt must be provided')) {
+        throw 'Token is empty';
       }
     }
 

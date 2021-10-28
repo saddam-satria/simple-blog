@@ -16,7 +16,7 @@ const addAuthor = async (req, res) => {
       birthDay: birthday,
       UserId: userId,
     });
-    res.status(201).json({ status: 'success', msg: 'success create new user', newAuthor: newAuthor.username });
+    res.status(201).json({ status: 'success', msg: 'success create new user', newAuthor: newAuthor.username, authorId: newAuthor.id });
   } catch (error) {
     res.status(401).json({ status: 'error', msg: error });
   }
@@ -81,7 +81,7 @@ const getDetailAuthor = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const author = await sequelize.models.Authors.findOne({ include: sequelize.models.Users, where: { id } });
+    const author = await sequelize.models.Authors.findOne({ include: sequelize.models.Users, where: { UserId: id } });
     if (author < 1) {
       throw 'Author not found';
     }

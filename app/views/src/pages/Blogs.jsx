@@ -43,8 +43,8 @@ const Blogs = () => {
 
   useEffect(() => {
     const getPosts = async () => {
-      const res = await getAllApi(`posts?limit=${limit}`);
       setLoading(true);
+      const res = await getAllApi(`posts?limit=${limit}`);
       if (res.status === 'success') {
         setBlogs(res.posts);
         setLoading(false);
@@ -53,10 +53,10 @@ const Blogs = () => {
     getPosts();
   }, [limit]);
 
-  console.log(loading);
   const loadPostHandler = async (e) => {
     e.preventDefault();
-    if (blogs.length > 10) {
+    if (blogs.length > 9) {
+      setLoading(true);
       setLimit(limit + 10);
     }
   };
@@ -65,6 +65,7 @@ const Blogs = () => {
     <div className="py-12 my-6">
       <div className="mx-4 lg:mx-8 xl:mx-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
+          {loading ? <h1>Loading ...</h1> : ''}
           {blogs.map((blog, index) => {
             return (
               <div key={index}>
@@ -76,10 +77,10 @@ const Blogs = () => {
           })}
         </div>
       </div>
-      {blogs.length > 10 && (
+      {blogs.length > 9 && (
         <div className="flex justify-center">
           <button onClick={loadPostHandler} className="px-4 py-2 rounded-lg text-black bg-blue-300 font-poppins font-medium text-base capitalize">
-            load more
+            {loading ? <h1>Please wait</h1> : <h1>Read More</h1>}
           </button>
         </div>
       )}
